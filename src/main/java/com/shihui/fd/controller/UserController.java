@@ -2,6 +2,7 @@ package com.shihui.fd.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -11,8 +12,9 @@ import org.springframework.stereotype.Controller;
  * @author shihui
  * @since 2024-02-14
  */
-@Controller
-@RequestMapping("/fd/user")
+@RestController
+@RequestMapping("/user")
 public class UserController {
+
 
 }
