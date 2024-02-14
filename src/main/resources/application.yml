@@ -1,0 +1,12 @@
+server:
+  port: 3000
+
+spring:
+  datasource:
+    url: jdbc:mysql://rm-cn-wwo3lxblv000livo.rwlb.rds.aliyuncs.com:3306/testdb
+    username: shihui
+    password: Shihui666
+
+logging:
+  level:
+    com.shihui: debug
