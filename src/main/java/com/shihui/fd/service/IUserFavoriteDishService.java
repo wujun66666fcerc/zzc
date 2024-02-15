@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author shihui
- * @since 2024-02-14
+ * @since 2024-02-15
  */
 public interface IUserFavoriteDishService extends IService<UserFavoriteDish> {
 

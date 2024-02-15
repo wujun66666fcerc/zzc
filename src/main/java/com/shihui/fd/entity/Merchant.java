@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author shihui
  * @since 2024-02-15
  */
-public class User implements Serializable {
+public class Merchant implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,9 +18,9 @@ public class User implements Serializable {
 
     private String password;
 
-    private String nickname;
+    private String name;
 
-    private String avatar;
+    private String phone;
 
     public String getAccount() {
         return account;
@@ -36,28 +36,28 @@ public class User implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-    public String getNickname() {
-        return nickname;
+    public String getName() {
+        return name;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setName(String name) {
+        this.name = name;
     }
-    public String getAvatar() {
-        return avatar;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "Merchant{" +
             "account=" + account +
             ", password=" + password +
-            ", nickname=" + nickname +
-            ", avatar=" + avatar +
+            ", name=" + name +
+            ", phone=" + phone +
         "}";
     }
 }

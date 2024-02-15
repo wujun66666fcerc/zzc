@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author shihui
- * @since 2024-02-14
+ * @since 2024-02-15
  */
 @Service
 public class UserFavoriteDishServiceImpl extends ServiceImpl<UserFavoriteDishMapper, UserFavoriteDish> implements IUserFavoriteDishService {

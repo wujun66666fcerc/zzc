@@ -8,24 +8,24 @@ import java.io.Serializable;
  * </p>
  *
  * @author shihui
- * @since 2024-02-14
+ * @since 2024-02-15
  */
 public class Store implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer merchantId;
+    private Integer storeId;
 
     private String storeName;
 
     private String storeLocation;
 
-    public Integer getMerchantId() {
-        return merchantId;
+    public Integer getStoreId() {
+        return storeId;
     }
 
-    public void setMerchantId(Integer merchantId) {
-        this.merchantId = merchantId;
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
     }
     public String getStoreName() {
         return storeName;
@@ -45,7 +45,7 @@ public class Store implements Serializable {
     @Override
     public String toString() {
         return "Store{" +
-            "merchantId=" + merchantId +
+            "storeId=" + storeId +
             ", storeName=" + storeName +
             ", storeLocation=" + storeLocation +
         "}";

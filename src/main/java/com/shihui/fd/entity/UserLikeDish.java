@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author shihui
- * @since 2024-02-14
+ * @since 2024-02-15
  */
 @TableName("user_like_dish")
 public class UserLikeDish implements Serializable {

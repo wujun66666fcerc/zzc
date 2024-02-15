@@ -1,6 +1,6 @@
 package com.shihui.fd.mapper;
 
-import com.shihui.fd.entity.UserLikeDish;
+import com.shihui.fd.entity.Ownership;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author shihui
  * @since 2024-02-15
  */
-public interface UserLikeDishMapper extends BaseMapper<UserLikeDish> {
+public interface OwnershipMapper extends BaseMapper<Ownership> {
 
 }

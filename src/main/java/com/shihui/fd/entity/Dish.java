@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * </p>
  *
  * @author shihui
- * @since 2024-02-14
+ * @since 2024-02-15
  */
 public class Dish implements Serializable {
 
@@ -41,7 +41,7 @@ public class Dish implements Serializable {
 
     private String detailedLocation;
 
-    private Integer merchantId;
+    private Integer storeId;
 
     public Integer getDishId() {
         return dishId;
@@ -134,12 +134,12 @@ public class Dish implements Serializable {
     public void setDetailedLocation(String detailedLocation) {
         this.detailedLocation = detailedLocation;
     }
-    public Integer getMerchantId() {
-        return merchantId;
+    public Integer getStoreId() {
+        return storeId;
     }
 
-    public void setMerchantId(Integer merchantId) {
-        this.merchantId = merchantId;
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
     }
 
     @Override
@@ -158,7 +158,7 @@ public class Dish implements Serializable {
             ", totalFavorites=" + totalFavorites +
             ", location=" + location +
             ", detailedLocation=" + detailedLocation +
-            ", merchantId=" + merchantId +
+            ", storeId=" + storeId +
         "}";
     }
 }

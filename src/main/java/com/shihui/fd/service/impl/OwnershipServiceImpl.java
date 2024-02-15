@@ -1,8 +1,8 @@
 package com.shihui.fd.service.impl;
 
-import com.shihui.fd.entity.User;
-import com.shihui.fd.mapper.UserMapper;
-import com.shihui.fd.service.IUserService;
+import com.shihui.fd.entity.Ownership;
+import com.shihui.fd.mapper.OwnershipMapper;
+import com.shihui.fd.service.IOwnershipService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-02-15
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+public class OwnershipServiceImpl extends ServiceImpl<OwnershipMapper, Ownership> implements IOwnershipService {
 
 }

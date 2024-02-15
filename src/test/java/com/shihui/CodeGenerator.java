@@ -15,7 +15,7 @@ public class CodeGenerator {
         String password="Shihui666";
         String moduleName="fd";
         String mapperLocation="E:\\zzcspring\\zzctest\\src\\main\\resources\\mapper\\"+moduleName;
-        String tables="browse_history,dish,evaluation,store,user,user_favorite_dish,user_like_dish";
+        String tables="browse_history,dish,evaluation,merchant,ownership,store,user,user_favorite_dish,user_like_dish,";
 
         FastAutoGenerator.create(url, username, password)
                 .globalConfig(builder -> {

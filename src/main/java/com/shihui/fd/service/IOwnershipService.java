@@ -1,6 +1,6 @@
 package com.shihui.fd.service;
 
-import com.shihui.fd.entity.Evaluation;
+import com.shihui.fd.entity.Ownership;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author shihui
  * @since 2024-02-15
  */
-public interface IEvaluationService extends IService<Evaluation> {
+public interface IOwnershipService extends IService<Ownership> {
 
 }

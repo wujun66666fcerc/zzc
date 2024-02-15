@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @since 2024-02-15
  */
 @Controller
-@RequestMapping("/fd/userLikeDish")
-public class UserLikeDishController {
+@RequestMapping("/fd/ownership")
+public class OwnershipController {
 
 }
