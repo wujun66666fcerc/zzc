@@ -1,14 +1,13 @@
 package com.shihui.fd.controller;
 
+import com.shihui.common.Utils.CosUtil;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.User;
-import com.shihui.fd.service.IDishService;
 import com.shihui.fd.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,5 +30,34 @@ public class UserController {
         List<User> list = userService.list();
         return Result.success(list);
     }
+    @RequestMapping("/login")
+    public ResponseEntity<String> getcode(@RequestParam(value = "code")String  code){
+        //System.out.println(code);
+        ResponseEntity<String> codetoopenid = userService.codetoopenid(code);
+        return codetoopenid;
+
+    }
+
+
+    private final CosUtil cosUtil;
+    public UserController(CosUtil cosUtil){
+        this.cosUtil = cosUtil;
+    }
+
+    @PostMapping("/edit")
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws Exception {
+        if (file.isEmpty()) {
+            throw new Exception("上传文件不能为空");
+        }
+
+        // 上传文件
+        String url = cosUtil.uploadFile(file);
+
+        // 构建包含 URL 的 JSON 对象
+        String responseJson = "{\"url\": \"" + url + "\"}";
+
+        return ResponseEntity.ok().body(responseJson);
+    }
+
 
 }
