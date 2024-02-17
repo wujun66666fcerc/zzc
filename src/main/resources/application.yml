@@ -12,11 +12,11 @@ logging:
     com.shihui: debug
 
 tencent:
-  appId: 1324340843
-  secretId: AKIDkNtHmGf9Ys6HTgniU2SfkFPUN2VltrhL
-  secretKey: iIdu342qQnx0tfGhu6860oV9h8S2YvES
-  region: ap-beijing
-  photoBucket: zzcimg-1324340843
+  appId: xxxxxxxxxxxxxxx
+  secretId: xxxxxxxxxxxxxxxxxxxxxxxx
+  secretKey: xxxxxxxxxxxxxxxx
+  region: xxxxxxxxxxxxx
+  photoBucket: xxxxxxxxxxxxx
 
 
 
