@@ -42,6 +42,25 @@ public class Dish implements Serializable {
     private String detailedLocation;
 
     private Integer storeId;
+    private Boolean promotionStatus;
+
+    public Boolean getPromotionStatus() {
+        return promotionStatus;
+    }
+
+    public void setPromotionStatus(Boolean promotionStatus) {
+        this.promotionStatus = promotionStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    private String description;
 
     public Integer getDishId() {
         return dishId;

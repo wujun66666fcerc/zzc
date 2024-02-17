@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shihui.fd.mapper.EvaluationMapper">
+    <resultMap id="EvaluationResultMap" type="com.shihui.common.DTO.EvaluationDTO">
+        <id property="evaluationId" column="evaluation_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="dishId" column="dish_id"/>
+        <result property="evaluationTime" column="evaluation_time"/>
+        <result property="rating" column="rating"/>
+        <result property="comment" column="comment"/>
+        <result property="avatar" column="avatar"/> <!-- 用户头像 -->
+        <result property="nickname" column="nickname"/> <!-- 用户昵称 -->
+    </resultMap>
 
+    <select id="selectEvaluationsWithUserByDishId" resultMap="EvaluationResultMap">
+        SELECT e.evaluation_id, e.user_id, e.dish_id, e.evaluation_time, e.rating, e.comment,
+               u.avatar, u.nickname
+        FROM evaluation e
+                 JOIN user u ON e.user_id = u.account
+        WHERE e.dish_id = #{dishId}
+    </select>
 </mapper>

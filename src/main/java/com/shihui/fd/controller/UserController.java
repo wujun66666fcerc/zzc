@@ -2,6 +2,7 @@ package com.shihui.fd.controller;
 
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.User;
+import com.shihui.fd.service.IDishService;
 import com.shihui.fd.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import java.util.List;
 public class UserController {
     @Autowired
     private IUserService userService;
+
     @GetMapping("/all")
     public Result<List<User>> getAllUser(){
         List<User> list = userService.list();
