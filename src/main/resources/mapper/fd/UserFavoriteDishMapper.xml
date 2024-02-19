@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shihui.fd.mapper.UserFavoriteDishMapper">
-
+    <select id="getMyFavDishes" resultType="com.shihui.fd.entity.Dish">
+        SELECT d.*
+        FROM dish d
+                 INNER JOIN user_favorite_dish u ON d.dish_id = u.dish_id
+        WHERE u.account = #{account}
+        ORDER BY u.collection_time DESC
+            LIMIT #{startindex}, #{pagesize}
+    </select>
 </mapper>

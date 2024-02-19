@@ -50,7 +50,7 @@ public class CosUtil {
 
     public String uploadFile(MultipartFile file) throws IOException {
         //上传至存储桶的名字
-        String KEY = "/" + file.getOriginalFilename();
+        String KEY = "/user_avatar/" + file.getOriginalFilename();
         String bucket = null;
         //根据业务模块，上传至其他存储桶
         bucket = photoBucket;

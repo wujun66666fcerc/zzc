@@ -170,6 +170,25 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         return result;
     }
 
+    @Override
+    public void incrementTotalLikes(Integer dishId) {
+        dishMapper.incrementTotalLikes(dishId);
+    }
+
+    @Override
+    public void decrementTotalLikes(Integer dishId) {
+        dishMapper.decrementTotalLikes(dishId);
+    }
+
+    @Override
+    public void incrementTotalFavs(Integer dishId) {
+        dishMapper.incrementTotalFavs(dishId);
+    }
+
+    @Override
+    public void decrementTotalFavs(Integer dishId) {
+        dishMapper.decrementTotalFavs(dishId);
+    }
 
 
 }

@@ -20,4 +20,12 @@ public interface IDishService extends IService<Dish> {
     List<Dish> getPromotedDishes();
 
     List<Dish> filterDishes(String conditions);
+
+    void incrementTotalLikes(Integer dishId);
+
+    void decrementTotalLikes(Integer dishId);
+
+    void incrementTotalFavs(Integer dishId);
+
+    void decrementTotalFavs(Integer dishId);
 }

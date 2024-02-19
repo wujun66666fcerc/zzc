@@ -2,4 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shihui.fd.mapper.DishMapper">
 
+    <update id="incrementTotalLikes">
+        UPDATE dish
+        SET total_likes = total_likes + 1
+        WHERE dish_id = #{dishId}
+    </update>
+    <update id="decrementTotalLikes">
+        UPDATE dish
+        SET total_likes = total_likes - 1
+        WHERE dish_id = #{dishId}
+    </update>
+    <update id="incrementTotalFavs">
+        UPDATE dish
+        SET total_favorites = total_favorites + 1
+        WHERE dish_id = #{dishId}
+    </update>
+    <update id="decrementTotalFavs">
+        UPDATE dish
+        SET total_favorites = total_favorites - 1
+        WHERE dish_id = #{dishId}
+    </update>
 </mapper>

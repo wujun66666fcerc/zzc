@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserLikeDishService extends IService<UserLikeDish> {
 
+    boolean existsByAccountAndDishId(String account, Integer dishId);
+
+    void addLike(String account, Integer dishId);
+
+    void delLike(String account, Integer dishId);
+
 }

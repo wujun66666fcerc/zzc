@@ -2,4 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shihui.fd.mapper.BrowseHistoryMapper">
 
+    <select id="getBrowseHistoryByAccount" resultType="com.shihui.fd.entity.Dish">
+        SELECT
+            d.dish_name, d.taste, d.category, d.ingredients, d.dish_price, d.image_url,
+            d.total_rating, d.total_likes, d.total_favorites, d.location, d.detailed_location,d.description,d.cuisine
+        FROM
+            browse_history bh
+                LEFT JOIN
+            dish d ON bh.dish_id = d.dish_id
+        WHERE
+            bh.account = #{account}
+        ORDER BY
+            bh.browse_time DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
 </mapper>

@@ -1,5 +1,7 @@
 package com.shihui.fd.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.shihui.common.Utils.CosUtil;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.User;
@@ -9,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -44,19 +48,39 @@ public class UserController {
         this.cosUtil = cosUtil;
     }
 
-    @PostMapping("/edit")
-    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws Exception {
-        if (file.isEmpty()) {
-            throw new Exception("上传文件不能为空");
+    @PostMapping ("/edit")
+    public Map<String, String> editUserInfo(@RequestParam(value = "file",required = false) MultipartFile file,
+                                               @RequestParam(value = "newnickname") String newNickname,
+                                               @RequestParam("account") String account) throws Exception {
+        System.out.println(account);
+        Map<String, String> response = new HashMap<>();
+
+
+        // 执行更新操作
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = cosUtil.uploadFile(file);
+            UpdateWrapper<User> avatarUpdateWrapper = new UpdateWrapper<>();
+            avatarUpdateWrapper.set("avatar", imageUrl).eq("account", account);
+            userService.update(avatarUpdateWrapper);
+            response.put("avatarUrl", imageUrl);
         }
+        UpdateWrapper<User> nicknameUpdateWrapper = new UpdateWrapper<>();
+        nicknameUpdateWrapper.set("nickname", newNickname).eq("account", account);
+        userService.update(nicknameUpdateWrapper);
+        response.put("nickname", newNickname);
+        return response;
+    }
 
-        // 上传文件
-        String url = cosUtil.uploadFile(file);
-
-        // 构建包含 URL 的 JSON 对象
-        String responseJson = "{\"url\": \"" + url + "\"}";
-
-        return ResponseEntity.ok().body(responseJson);
+    @GetMapping ("/edit1")
+    public Map<String, String> editUserInfo(
+                                            @RequestParam(value = "newnickname") String newNickname,
+                                            @RequestParam("account") String account) throws Exception {
+        Map<String, String> response = new HashMap<>();
+        UpdateWrapper<User> nicknameUpdateWrapper = new UpdateWrapper<>();
+        nicknameUpdateWrapper.set("nickname", newNickname).eq("account", account);
+        userService.update(nicknameUpdateWrapper);
+        response.put("nickname", newNickname);
+        return response;
     }
 
 
