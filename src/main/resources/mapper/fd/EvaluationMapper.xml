@@ -11,6 +11,30 @@
         <result property="avatar" column="avatar"/> <!-- 用户头像 -->
         <result property="nickname" column="nickname"/> <!-- 用户昵称 -->
     </resultMap>
+    <resultMap id="EvaluationListResultMap" type="com.shihui.common.DTO.EvaluationListDTO">
+        <id property="evaluationId" column="evaluation_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="dishId" column="dish_id"/>
+        <result property="evaluationTime" column="evaluation_time"/>
+        <result property="rating" column="rating"/>
+        <result property="comment" column="comment"/>
+        <result property="avatar" column="avatar"/> <!-- 用户头像 -->
+        <result property="nickname" column="nickname"/> <!-- 用户昵称 -->
+        <result property="dishName" column="dish_name"/> <!-- 用户昵称 -->
+        <result property="taste" column="taste"/>
+        <result property="cuisine" column="cuisine"/>
+        <result property="category" column="category"/>
+        <result property="ingredients" column="ingredients"/>
+        <result property="dishPrice" column="dish_price"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="totalRating" column="total_rating"/>
+        <result property="totalLikes" column="total_likes"/>
+        <result property="totalFavorites" column="total_favorites"/>
+        <result property="location" column="location"/>
+        <result property="detailedLocation" column="detailed_location"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
 
     <select id="selectEvaluationsWithUserByDishId" resultMap="EvaluationResultMap">
         SELECT e.evaluation_id, e.user_id, e.dish_id, e.evaluation_time, e.rating, e.comment,
@@ -18,5 +42,17 @@
         FROM evaluation e
                  JOIN user u ON e.user_id = u.account
         WHERE e.dish_id = #{dishId}
+        ORDER BY e.evaluation_time DESC
+    </select>
+    <select id="getMyEvaluations" resultType="com.shihui.common.DTO.EvaluationListDTO">
+        SELECT e.evaluation_id, e.user_id, e.dish_id, e.evaluation_time, e.rating, e.comment,
+               u.avatar, u.nickname,d.dish_name, d.taste, d.category, d.ingredients, d.dish_price, d.image_url,
+               d.total_rating, d.total_likes, d.total_favorites, d.location, d.detailed_location,d.description,d.cuisine
+        FROM evaluation e
+                 LEFT JOIN dish d ON e.dish_id = d.dish_id
+                 LEFT JOIN user u ON e.user_id = u.account
+        WHERE e.user_id = #{account}
+        ORDER BY e.evaluation_time DESC
+            LIMIT #{offset}, #{pageSize}
     </select>
 </mapper>
