@@ -22,4 +22,16 @@
         SET total_favorites = total_favorites - 1
         WHERE dish_id = #{dishId}
     </update>
+    <select id="getLikedDishesByAccount" resultType="com.shihui.fd.entity.Dish">
+        SELECT d.*
+        FROM dish d
+                 INNER JOIN user_like_dish u ON d.dish_id = u.dish_id
+        WHERE u.account = #{account}
+    </select>
+    <select id="getMyFavDishes" resultType="com.shihui.fd.entity.Dish">
+        SELECT d.*
+        FROM dish d
+                 INNER JOIN user_favorite_dish u ON d.dish_id = u.dish_id
+        WHERE u.account = #{account}
+    </select>
 </mapper>

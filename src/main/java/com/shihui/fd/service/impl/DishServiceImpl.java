@@ -1,18 +1,18 @@
 package com.shihui.fd.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.shihui.common.DTO.RecommendationRequest;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
+import com.shihui.fd.entity.UserFavoriteDish;
+import com.shihui.fd.entity.UserLikeDish;
 import com.shihui.fd.mapper.DishMapper;
 import com.shihui.fd.service.IDishService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -26,6 +26,8 @@ import java.util.Map;
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements IDishService {
     @Autowired
     private DishMapper dishMapper;
+    private UserFavoriteDishServiceImpl userFavoriteDishService;
+    private UserLikeDishServiceImpl userLikeDishService;
 
     @Override
     public List<Dish> listTopDishes(int limit) {
@@ -188,6 +190,139 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
     @Override
     public void decrementTotalFavs(Integer dishId) {
         dishMapper.decrementTotalFavs(dishId);
+    }
+
+    @Override
+    public List<Dish> getRecommendations(RecommendationRequest request) {
+        Dish baseDish = getRandomDishFromUserFavoritesOrLikes(request.getAccount());
+        //System.out.println(baseDish);
+        List<Integer> displayDishIds = request.getDisplayedDishIds();
+        List<Dish> allDishes = this.list();
+        allDishes.removeIf(dish->displayDishIds.contains(dish.getDishId()));
+        int minLikes = Integer.MAX_VALUE;
+        int maxLikes = Integer.MIN_VALUE;
+        int minFavorites = Integer.MAX_VALUE;
+        int maxFavorites = Integer.MIN_VALUE;
+
+        for (Dish dish : allDishes) {
+            int likes = dish.getTotalLikes();
+            int favorites = dish.getTotalFavorites();
+
+            // 计算最小值和最大值
+            minLikes = Math.min(minLikes, likes);
+            maxLikes = Math.max(maxLikes, likes);
+            minFavorites = Math.min(minFavorites, favorites);
+            maxFavorites = Math.max(maxFavorites, favorites);
+        }
+        int finalMinLikes = minLikes;
+        int finalMinFavorites = minFavorites;
+        int finalMaxLikes = maxLikes;
+        int finalMaxFavorites = maxFavorites;
+        Collections.sort(allDishes,(d1, d2)->calculateSimilarity(baseDish, d2, finalMinLikes, finalMinFavorites, finalMaxLikes, finalMaxFavorites) - calculateSimilarity(baseDish, d1,finalMinLikes, finalMinFavorites, finalMaxLikes, finalMaxFavorites));
+        int size = request.getSize();
+        List<Dish> recommendations = allDishes.subList(0, Math.min(size, allDishes.size()));
+//        for(Dish dish:recommendations){
+//            System.out.println(dish+":"+calculateSimilarity(baseDish,dish,finalMinLikes, finalMinFavorites, finalMaxLikes, finalMaxFavorites));
+//        }
+        return recommendations;
+
+    }
+    private static final double PRICE_THRESHOLD = 2.0;
+    private int calculateSimilarity(Dish baseDish,  Dish otherDish,int min_likes,int min_favorites,int max_likes,int max_favorites) {
+        int similarityScore = 0;
+
+        // 比较口味
+        Set<String> baseTastes = new HashSet<>(Arrays.asList(baseDish.getTaste().split(",")));
+        Set<String> otherTastes = new HashSet<>(Arrays.asList(otherDish.getTaste().split(",")));
+        similarityScore += calculateSetSimilarity(baseTastes, otherTastes);
+        //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的口味相似度为"+similarityScore);
+
+        // 比较菜系
+        if (baseDish.getCuisine().equals(otherDish.getCuisine())) {
+            similarityScore++;
+           // System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的菜系相同加一分");
+        }
+
+        // 比较原料
+        Set<String> baseIngredients = new HashSet<>(Arrays.asList(baseDish.getIngredients().split(",")));
+        Set<String> otherIngredients = new HashSet<>(Arrays.asList(otherDish.getIngredients().split(",")));
+        similarityScore += calculateSetSimilarity(baseIngredients, otherIngredients);
+        //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的原料相似度为"+calculateSetSimilarity(baseIngredients, otherIngredients));
+
+        // 比较类别
+        if (baseDish.getCategory().equals(otherDish.getCategory())) {
+            similarityScore++;
+            //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的类别相同加一分");
+        }
+
+        // 比较地理位置
+        if (baseDish.getLocation().equals(otherDish.getLocation())) {
+            similarityScore++;
+            //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的区域相同加一分");
+        }
+
+        // 比较价格
+        if (Math.abs(baseDish.getDishPrice() - otherDish.getDishPrice()) < PRICE_THRESHOLD) {
+            similarityScore++;
+            //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的价格阈值加一分");
+        }
+
+        // 比较地理位置
+        if (baseDish.getStoreId().equals(otherDish.getStoreId())) {
+            similarityScore++;
+            //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的商家相同加一分");
+        }
+        // 计算归一化后的相似度得分
+        double normalizedLikes = (double) (otherDish.getTotalLikes() - min_likes) / (max_likes - min_likes);
+        double normalizedFavorites = (double) (otherDish.getTotalFavorites() - min_favorites) / (max_favorites - min_favorites);
+        double s=normalizedFavorites+normalizedLikes;
+
+        // 将权重后的相似度得分转换为整数类型，四舍五入
+        similarityScore +=(int) Math.round(s);
+        //System.out.println(min_likes+" "+min_favorites+" "+max_likes+" "+max_favorites);
+        //System.out.println(baseDish.getDishName()+"和"+otherDish.getDishName()+"的点赞收藏加了"+(int) Math.round(s));
+
+        return similarityScore;
+
+    }
+    private int calculateSetSimilarity(Set<String> set1, Set<String> set2) {
+        int commonElements = 0;
+        for (String element : set1) {
+            if (set2.contains(element)) {
+                commonElements++;
+            }
+        }
+        return commonElements;
+    }
+
+    private Dish getRandomDishFromUserFavoritesOrLikes(String account) {
+
+        List<Dish> likedDishes = dishMapper.getLikedDishesByAccount(account);
+        // 从用户收藏或点赞的菜品中查询数据
+        List<Dish> favoriteDishes = dishMapper.getMyFavDishes(account);
+
+
+        // 合并收藏和点赞的菜品列表
+        List<Dish> userDishes = new ArrayList<>();
+        userDishes.addAll(favoriteDishes);
+        userDishes.addAll(likedDishes);
+        System.out.println(666);
+
+        // 随机选择一道菜品
+        if (!userDishes.isEmpty()) {
+            Random random = new Random();
+            int randomIndex = random.nextInt(userDishes.size());
+            return userDishes.get(randomIndex);
+        } else {
+            return getTop10RatedDish();
+        }
+    }
+
+    private Dish getTop10RatedDish() {
+        List<Dish> top10=dishMapper.getTop10RatedDish();
+        Random random = new Random();
+        int randomIndex = random.nextInt(top10.size());
+        return top10.get(randomIndex);
     }
 
 

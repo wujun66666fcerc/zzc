@@ -2,15 +2,13 @@ package com.shihui.fd.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.shihui.common.DTO.RecommendationRequest;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
 import com.shihui.fd.service.IDishService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,16 +26,10 @@ import java.util.stream.Collectors;
 public class DishController {
     @Autowired
     private IDishService dishService;
-    @GetMapping("/rec")
-    public Result<List<Dish>> getRecDishes(@RequestParam("pageNum")Integer pageNum,
-                                           @RequestParam("pageSize")Integer pageSize) {
-        Page<Dish> page = new Page<>(pageNum, pageSize);
-        dishService.page(page,null);
-
-        // 查询推荐菜品
-        //List<Dish> dishes = dishService.listTopDishes(10);
-        // 封装成符合前端要求的JSON格式
-        return Result.success(page.getRecords());
+    @PostMapping("/rec")
+    public Result<List<Dish>> getRecDishes(@RequestBody RecommendationRequest request) {
+        List<Dish> recommendations=dishService.getRecommendations(request);
+        return Result.success(recommendations);
     }
     @GetMapping("/promoted")
     public Result<List<Dish>> getPromotedDishes() {
