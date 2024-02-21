@@ -1,6 +1,7 @@
 package com.shihui.fd.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.shihui.fd.entity.Dish;
 import com.shihui.fd.entity.UserLikeDish;
 import com.shihui.fd.mapper.UserLikeDishMapper;
 import com.shihui.fd.service.IUserLikeDishService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -45,5 +47,10 @@ public class UserLikeDishServiceImpl extends ServiceImpl<UserLikeDishMapper, Use
         QueryWrapper<UserLikeDish> queryWrapper=new QueryWrapper<>();
         queryWrapper.eq("account",account).eq("dish_id",dishId);
         userLikeDishMapper.delete(queryWrapper);
+    }
+
+    @Override
+    public List<Dish> getLikedDishesByAccount(String account) {
+        return userLikeDishMapper.getLikedDishesByAccount(account);
     }
 }

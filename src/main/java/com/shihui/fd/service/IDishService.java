@@ -1,5 +1,6 @@
 package com.shihui.fd.service;
 
+import com.shihui.common.DTO.RecommendationRequest;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -28,4 +29,7 @@ public interface IDishService extends IService<Dish> {
     void incrementTotalFavs(Integer dishId);
 
     void decrementTotalFavs(Integer dishId);
+
+    List<Dish> getRecommendations(RecommendationRequest request);
+
 }

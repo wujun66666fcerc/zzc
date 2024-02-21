@@ -1,7 +1,10 @@
 package com.shihui.fd.service;
 
+import com.shihui.fd.entity.Dish;
 import com.shihui.fd.entity.UserLikeDish;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,5 +21,7 @@ public interface IUserLikeDishService extends IService<UserLikeDish> {
     void addLike(String account, Integer dishId);
 
     void delLike(String account, Integer dishId);
+
+    List<Dish> getLikedDishesByAccount(String account);
 
 }
