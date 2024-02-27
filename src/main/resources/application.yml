@@ -3,17 +3,17 @@ server:
 
 spring:
   datasource:
-    url: xxxxxxxxxxxxxxxxxxxxxxxxx
-    username: xxxxxxxxxxxxxxxxx
-    password: xxxxxxxxxxxxxxxxxxxxx
+    url:
+    username:
+    password:
 
 logging:
   level:
     com.shihui: debug
 
 tencent:
-  appId: xxxxxxxxxxxxxxxxxxxxxx
-  secretId: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  secretKey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  region: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  photoBucket: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  appId:
+  secretId:
+  secretKey:
+  region:
+  photoBucket:

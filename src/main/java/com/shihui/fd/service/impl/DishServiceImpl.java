@@ -227,6 +227,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         return recommendations;
 
     }
+
+    @Override
+    public List<Dish> findSimilarDishesByCategory(List<String> categories) {
+        List<Dish> similarDishes = new ArrayList<>();
+        for (String category : categories) {
+            List<Dish> dishes = dishMapper.findSimilarDishesByName(category);
+            similarDishes.addAll(dishes);
+        }
+        return similarDishes;
+    }
+
     private static final double PRICE_THRESHOLD = 2.0;
     private int calculateSimilarity(Dish baseDish,  Dish otherDish,int min_likes,int min_favorites,int max_likes,int max_favorites) {
         int similarityScore = 0;
