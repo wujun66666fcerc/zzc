@@ -33,4 +33,6 @@ public interface DishMapper extends BaseMapper<Dish> {
     @Select("SELECT * FROM dish ORDER BY total_rating DESC LIMIT 10")
     List<Dish> getTop10RatedDish();
 
+    @Select("SELECT * FROM dish WHERE dish_name LIKE CONCAT('%', #{keyword}, '%')")
+    List<Dish> findSimilarDishesByName(@Param("keyword") String keyword);
 }

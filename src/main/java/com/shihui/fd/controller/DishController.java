@@ -1,15 +1,23 @@
 package com.shihui.fd.controller;
 
+import com.aliyun.imagerecog20190930.models.RecognizeFoodResponse;
+import com.aliyun.imagerecog20190930.models.RecognizeFoodResponseBody;
+import com.aliyun.tea.TeaException;
+import com.aliyun.teautil.models.RuntimeOptions;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shihui.common.DTO.RecommendationRequest;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
+import com.shihui.fd.entity.RecognitionResult;
+import com.shihui.fd.entity.TwoReg;
 import com.shihui.fd.service.IDishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,6 +149,61 @@ public class DishController {
         sortedResult = sortedResult.subList(startIndex, endIndex);
         return Result.success(sortedResult);
     }
+    @PostMapping("/uploadImage")
+    public Result<TwoReg> uploadImage(@RequestParam("file") MultipartFile file) {
+        Map<String, TwoReg> result = new HashMap<>();
+        try {
+            InputStream inputStream = file.getInputStream();
+            RecognizeFoodResponse response = recognizeFood(inputStream);
+            RecognizeFoodResponseBody body = response.getBody();
+            List<RecognizeFoodResponseBody.RecognizeFoodResponseBodyDataTopFives> topFives = body.getData().topFives;
+            List<String> categories = new ArrayList<>();
+            for(RecognizeFoodResponseBody.RecognizeFoodResponseBodyDataTopFives f:topFives){
+                categories.add(f.category);
+                System.out.println(f.category);
+            }
+            List<Dish> similarDishes = dishService.findSimilarDishesByCategory(categories);
+            // 转换 topFives
+            List<RecognitionResult> recognitionResults = new ArrayList<>();
+            for (RecognizeFoodResponseBody.RecognizeFoodResponseBodyDataTopFives f : topFives) {
+                recognitionResults.add(new RecognitionResult(f.category, f.calorie, f.score));
+            }
+            TwoReg twoReg = new TwoReg(similarDishes,recognitionResults);
+            return Result.success(twoReg);
+            //return Common.toJSONString(response);
+            //System.out.println(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(response)));
+            //return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            //result.put("error", "Error");
+            return Result.fail();
+        }
+
+    }
+    public RecognizeFoodResponse recognizeFood(InputStream inputStream) {
+        try {
+            String accessKeyId = System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID");
+            String accessKeySecret = System.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET");
+            com.aliyun.imagerecog20190930.Client client = createClient(accessKeyId, accessKeySecret);
+            com.aliyun.imagerecog20190930.models.RecognizeFoodAdvanceRequest recognizeFoodAdvanceRequest = new com.aliyun.imagerecog20190930.models.RecognizeFoodAdvanceRequest()
+                    .setImageURLObject(inputStream);
+            RuntimeOptions runtime = new RuntimeOptions();
+            return client.recognizeFoodAdvance(recognizeFoodAdvanceRequest, runtime);
+        } catch (TeaException | IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public com.aliyun.imagerecog20190930.Client createClient(String accessKeyId, String accessKeySecret) throws Exception {
+        com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
+                .setAccessKeyId(accessKeyId)
+                .setAccessKeySecret(accessKeySecret);
+        config.endpoint = "imagerecog.cn-shanghai.aliyuncs.com";
+        return new com.aliyun.imagerecog20190930.Client(config);
+    }
+
 
 
 

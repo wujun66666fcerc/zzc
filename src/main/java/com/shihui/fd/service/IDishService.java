@@ -32,4 +32,5 @@ public interface IDishService extends IService<Dish> {
 
     List<Dish> getRecommendations(RecommendationRequest request);
 
+    List<Dish> findSimilarDishesByCategory(List<String> categories);
 }
