@@ -1,5 +1,9 @@
 package com.shihui.fd.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +14,9 @@ import java.io.Serializable;
  * @author shihui
  * @since 2024-02-15
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Merchant implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,42 +29,10 @@ public class Merchant implements Serializable {
 
     private String phone;
 
-    public String getAccount() {
-        return account;
-    }
+    private Integer auditStatus;
+    private String auditStoreLocation;
+    private String auditStoreName;
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    @Override
-    public String toString() {
-        return "Merchant{" +
-            "account=" + account +
-            ", password=" + password +
-            ", name=" + name +
-            ", phone=" + phone +
-        "}";
-    }
 }

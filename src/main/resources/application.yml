@@ -3,17 +3,17 @@ server:
 
 spring:
   datasource:
-    url:
-    username:
-    password:
+    url: jdbc:mysql://rm-cn-wwo3lxblv000livo.rwlb.rds.aliyuncs.com:3306/testdb
+    username: shihui
+    password: Shihui666
 
 logging:
   level:
     com.shihui: debug
 
 tencent:
-  appId:
-  secretId:
-  secretKey:
-  region:
-  photoBucket:
+  appId: 1324340843
+  secretId: AKIDkNtHmGf9Ys6HTgniU2SfkFPUN2VltrhL
+  secretKey: iIdu342qQnx0tfGhu6860oV9h8S2YvES
+  region: ap-beijing
+  photoBucket: zzcimg-1324340843

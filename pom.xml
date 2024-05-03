@@ -17,6 +17,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.janeluo</groupId>
+            <artifactId>ikanalyzer</artifactId>
+            <version>2012_u6</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/ikanalyzer-2012_u6.jar</systemPath>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>imagerecog20190930</artifactId>
             <version>${aliyun.imagerecog.version}</version>
