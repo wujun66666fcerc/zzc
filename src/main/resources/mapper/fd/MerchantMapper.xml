@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shihui.fd.mapper.MerchantMapper">
+    <resultMap id="MerchantStoreInfoResultMap" type="com.shihui.fd.entity.MerchantStoreInfo">
+        <result property="merchantAccount" column="merchantAccount"/>
+        <result property="merchantName" column="merchantName"/>
+        <result property="merchantPhone" column="merchantPhone"/>
+        <result property="auditStatus" column="auditStatus"/>
+        <collection property="stores" ofType="com.shihui.fd.entity.Store">
+            <result property="storeId" column="storeId"/>
+            <result property="storeName" column="storeName"/>
+            <result property="storeLocation" column="storeLocation"/>
+        </collection>
+    </resultMap>
+
+    <select id="getMerchantStoreInfo" resultMap="MerchantStoreInfoResultMap">
+        SELECT m.account AS merchantAccount, m.name AS merchantName, m.phone AS merchantPhone,
+               m.audit_status AS auditStatus,
+               s.store_id AS storeId, s.store_name AS storeName, s.store_location AS storeLocation
+        FROM merchant m
+                 LEFT JOIN ownership o ON m.account = o.merchant_account
+                 LEFT JOIN store s ON o.store_id = s.store_id
+        WHERE m.account = #{merchantAccount}
+    </select>
 
 </mapper>

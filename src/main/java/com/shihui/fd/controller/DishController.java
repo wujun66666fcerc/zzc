@@ -13,14 +13,17 @@ import com.shihui.fd.entity.RecognitionResult;
 import com.shihui.fd.entity.TwoReg;
 import com.shihui.fd.service.IDishService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.wltea.analyzer.core.IKSegmenter;
+import org.wltea.analyzer.core.Lexeme;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
-
 /**
  * <p>
  *  前端控制器
@@ -34,6 +37,8 @@ import java.util.stream.Collectors;
 public class DishController {
     @Autowired
     private IDishService dishService;
+    @Autowired
+    private org.wltea.analyzer.cfg.Configuration ikAnalyzerConfig;
     @PostMapping("/rec")
     public Result<List<Dish>> getRecDishes(@RequestBody RecommendationRequest request) {
         List<Dish> recommendations=dishService.getRecommendations(request);
@@ -64,26 +69,82 @@ public class DishController {
     @GetMapping("/search")
     public Result<List<Dish>> getSearchDishes(@RequestParam("pageNum")Integer pageNum,
                                               @RequestParam("pageSize")Integer pageSize,
-                                              @RequestParam("value")String value) {
+                                              @RequestParam("value")String value) throws IOException {
         Page<Dish> page = new Page<>(pageNum, pageSize);
         // 创建查询条件
         QueryWrapper<Dish> queryWrapper = new QueryWrapper<>();
-        queryWrapper
-                .like("dish_name", value)
-                .or()
-                .like("taste", value)
-                .or()
-                .like("category", value)
-                .or()
-                .like("cuisine", value)
-                .or()
-                .like("ingredients", value)
-                .or()
-                .like("detailed_location", value)
-                .or()
-                .like("description",value);
-        dishService.page(page, queryWrapper);
-        return Result.success(page.getRecords());
+        // 使用 IK Analyzer 对关键字进行分词处理
+        List<String> keywords = analyzeKeywords(value);
+        for (String keyword : keywords) {
+            queryWrapper.or(wrapper -> wrapper
+                    .like("dish_name", keyword)
+                    .or()
+                    .like("taste", keyword)
+                    .or()
+                    .like("category", keyword)
+                    .or()
+                    .like("cuisine", keyword)
+                    .or()
+                    .like("ingredients", keyword)
+                    .or()
+                    .like("detailed_location", keyword)
+                    .or()
+                    .like("description", keyword)
+            );
+        }
+
+        List<Dish> list = dishService.list(queryWrapper);
+        // 计算每条记录中包含关键词的个数，并进行排序
+        // 创建一个 Map 用于存储每个 Dish 对象对应的匹配个数
+        Map<Dish, Integer> matchCountMap = new HashMap<>();
+        for (Dish dish : list) {
+            int matchCount = 0;
+            for (String keyword : keywords) {
+                if (dish.getDishName().contains(keyword) ||
+                        dish.getTaste().contains(keyword) ||
+                        dish.getCategory().contains(keyword) ||
+                        dish.getCuisine().contains(keyword) ||
+                        dish.getIngredients().contains(keyword) ||
+                        dish.getDetailedLocation().contains(keyword) ||
+                        dish.getDescription().contains(keyword)) {
+                    matchCount++;
+                }
+            }
+            matchCountMap.put(dish, matchCount); // 将匹配个数和对应的 Dish 对象存入 Map 中
+        }
+// 根据匹配个数排序
+        List<Map.Entry<Dish, Integer>> sortedEntries = new ArrayList<>(matchCountMap.entrySet());
+        sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue())); // 匹配个数从多到少排序
+
+// 排序后的 sortedEntries 列表中包含了按照匹配个数排序的 Dish 对象和对应的匹配个数
+// 遍历 sortedEntries 获取排好序的 Dish 对象列表
+        List<Dish> sortedDishes = new ArrayList<>();
+        for (Map.Entry<Dish, Integer> entry : sortedEntries) {
+            sortedDishes.add(entry.getKey());
+           // System.out.println(entry.getKey().getDishName()+":"+entry.getValue());
+        }
+        // 计算分页的起始索引和结束索引
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, sortedDishes.size());
+
+        // 提取指定范围内的元素作为分页结果
+        List<Dish> pageList = sortedDishes.subList(startIndex, endIndex);
+
+        return Result.success(pageList);
+    }
+
+    private List<String> analyzeKeywords(String text) throws IOException {
+        List<String> keywords = new ArrayList<>();
+        StringReader reader = new StringReader(text);
+        IKSegmenter ikSegmenter = new IKSegmenter(reader,ikAnalyzerConfig);
+        Lexeme lexeme;
+        while ((lexeme = ikSegmenter.next()) != null) {
+            keywords.add(lexeme.getLexemeText());
+        }
+//        for(String w:keywords){
+//            System.out.println(w);
+//        }
+        return keywords;
     }
 
     private Integer matchesCondition(Dish dish, String condition) {

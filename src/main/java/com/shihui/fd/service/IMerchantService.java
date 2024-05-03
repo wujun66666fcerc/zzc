@@ -2,6 +2,7 @@ package com.shihui.fd.service;
 
 import com.shihui.fd.entity.Merchant;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.shihui.fd.entity.MerchantStoreInfo;
 
 /**
  * <p>
@@ -12,5 +13,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2024-02-15
  */
 public interface IMerchantService extends IService<Merchant> {
+
+    MerchantStoreInfo getMerchantStoreInfo(String account);
+
 
 }

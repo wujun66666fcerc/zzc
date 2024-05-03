@@ -2,6 +2,8 @@ package com.shihui.fd.mapper;
 
 import com.shihui.fd.entity.Merchant;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.shihui.fd.entity.MerchantStoreInfo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MerchantMapper extends BaseMapper<Merchant> {
 
+    MerchantStoreInfo getMerchantStoreInfo(@Param("merchantAccount") String merchantAccount);
 }
+

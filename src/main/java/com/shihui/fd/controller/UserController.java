@@ -35,9 +35,10 @@ public class UserController {
         return Result.success(list);
     }
     @RequestMapping("/login")
-    public ResponseEntity<String> getcode(@RequestParam(value = "code")String  code){
+    public ResponseEntity<String> getcode(@RequestParam(value = "code")String  code,
+    @RequestParam(value = "isMerchant", required = false, defaultValue = "false") Integer isMerchant){//是否是商家
         //System.out.println(code);
-        ResponseEntity<String> codetoopenid = userService.codetoopenid(code);
+        ResponseEntity<String> codetoopenid = userService.codetoopenid(code,isMerchant);
         return codetoopenid;
 
     }
