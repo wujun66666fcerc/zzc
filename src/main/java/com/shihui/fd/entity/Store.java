@@ -1,6 +1,10 @@
 package com.shihui.fd.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 import java.io.Serializable;
@@ -13,6 +17,10 @@ import java.io.Serializable;
  * @author shihui
  * @since 2024-02-15
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Store implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,34 +32,5 @@ public class Store implements Serializable {
 
     private String storeLocation;
 
-    public Integer getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(Integer storeId) {
-        this.storeId = storeId;
-    }
-    public String getStoreName() {
-        return storeName;
-    }
-
-    public void setStoreName(String storeName) {
-        this.storeName = storeName;
-    }
-    public String getStoreLocation() {
-        return storeLocation;
-    }
-
-    public void setStoreLocation(String storeLocation) {
-        this.storeLocation = storeLocation;
-    }
-
-    @Override
-    public String toString() {
-        return "Store{" +
-            "storeId=" + storeId +
-            ", storeName=" + storeName +
-            ", storeLocation=" + storeLocation +
-        "}";
-    }
+    private String location;
 }

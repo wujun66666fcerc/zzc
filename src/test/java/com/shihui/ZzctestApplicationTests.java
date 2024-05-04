@@ -29,10 +29,11 @@ class ZzctestApplicationTests {
     void testadd()
     {
         Store store = new Store();
-        store.setStoreId(null);
+        store.setStoreId(890347522);
         store.setStoreName("wi");
         store.setStoreLocation("匆匆那年");
-        StoreRequest storeRequest = new StoreRequest(1L, store);
+        store.setLocation("荷园");
+        StoreRequest storeRequest = new StoreRequest("ol8166_fY1qsI1i3-NDtD89Z5JRQ", store);
         storeController.saveOrUpdateStore(storeRequest);
     }
 

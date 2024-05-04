@@ -14,10 +14,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface IStoreService extends IService<Store> {
-    /**
-     * 添加一个店铺
-     * @param store
-     * @return
-     */
 
 }

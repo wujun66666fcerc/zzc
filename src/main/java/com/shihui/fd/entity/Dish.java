@@ -1,5 +1,6 @@
 package com.shihui.fd.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class Dish implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId
     private Integer dishId;
 
     private String dishName;
