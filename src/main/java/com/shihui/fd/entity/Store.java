@@ -1,5 +1,8 @@
 package com.shihui.fd.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+
+
 import java.io.Serializable;
 
 /**
@@ -14,6 +17,7 @@ public class Store implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId
     private Integer storeId;
 
     private String storeName;

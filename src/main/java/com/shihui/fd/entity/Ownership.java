@@ -2,6 +2,9 @@ package com.shihui.fd.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +15,8 @@ import java.io.Serializable;
  * @author shihui
  * @since 2024-02-15
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class Ownership implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,6 +27,7 @@ public class Ownership implements Serializable {
     private String merchantAccount;
 
     private Integer storeId;
+
 
     public Integer getOwnershipId() {
         return ownershipId;
