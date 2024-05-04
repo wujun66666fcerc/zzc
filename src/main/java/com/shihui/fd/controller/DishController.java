@@ -5,8 +5,10 @@ import com.aliyun.imagerecog20190930.models.RecognizeFoodResponseBody;
 import com.aliyun.tea.TeaException;
 import com.aliyun.teautil.models.RuntimeOptions;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shihui.common.DTO.RecommendationRequest;
+import com.shihui.common.Utils.CosUtil;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
 import com.shihui.fd.entity.RecognitionResult;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -95,7 +98,7 @@ public class DishController {
 
         List<Dish> list = dishService.list(queryWrapper);
         // 计算每条记录中包含关键词的个数，并进行排序
-        // 创建一个 Map 用于存储每个 Dish 对象对应的匹配个数
+        // 创建一个 Map 用于存储每个 DishRequest 对象对应的匹配个数
         Map<Dish, Integer> matchCountMap = new HashMap<>();
         for (Dish dish : list) {
             int matchCount = 0;
@@ -110,14 +113,14 @@ public class DishController {
                     matchCount++;
                 }
             }
-            matchCountMap.put(dish, matchCount); // 将匹配个数和对应的 Dish 对象存入 Map 中
+            matchCountMap.put(dish, matchCount); // 将匹配个数和对应的 DishRequest 对象存入 Map 中
         }
 // 根据匹配个数排序
         List<Map.Entry<Dish, Integer>> sortedEntries = new ArrayList<>(matchCountMap.entrySet());
         sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue())); // 匹配个数从多到少排序
 
-// 排序后的 sortedEntries 列表中包含了按照匹配个数排序的 Dish 对象和对应的匹配个数
-// 遍历 sortedEntries 获取排好序的 Dish 对象列表
+// 排序后的 sortedEntries 列表中包含了按照匹配个数排序的 DishRequest 对象和对应的匹配个数
+// 遍历 sortedEntries 获取排好序的 DishRequest 对象列表
         List<Dish> sortedDishes = new ArrayList<>();
         for (Map.Entry<Dish, Integer> entry : sortedEntries) {
             sortedDishes.add(entry.getKey());
@@ -267,6 +270,93 @@ public class DishController {
 
 
 
+    private final CosUtil cosUtil;
+    public DishController(CosUtil cosUtil){
+        this.cosUtil = cosUtil;
+    }
 
+    /**
+     * 修改菜品信息
+     * @param file
+     * @param dishId
+     * @param dishName
+     * @param dishPrice
+     * @param taste
+     * @param cuisine
+     * @param description
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/dishEdit")
+    public Result<String> dishEdit(@RequestParam("file") MultipartFile file,
+                                        @RequestParam("dishId") Long dishId,
+                                        @RequestParam("dishName") String dishName,
+                                        @RequestParam("dishPrice") double dishPrice,
+                                        @RequestParam("taste") String taste,
+                                        @RequestParam("cuisine") String cuisine,
+                                        @RequestParam("description") String description) throws IOException {
 
+        UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
+        if(file != null && !file.isEmpty())
+        {
+            String imageUrl = cosUtil.uploadFile(file);
+            dishUpdateWrapper.set("image_url", imageUrl).eq("dish_id", dishId);
+        }
+        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName).set("dish_price",dishPrice).set("dish_price",dishPrice)
+                        .set("taste",taste).set("cuisine",cuisine).set("description",description).eq("dish_id", dishId);
+        if(!dishService.update(dishUpdateWrapper))
+            return Result.fail("edit fail");
+        return Result.success("edit success");
+    }
+
+    @PostMapping("/dishEdit1")
+    public Result<String> dishEdit(
+                                        @RequestParam("dishId") Long dishId,
+                                        @RequestParam("dishName") String dishName,
+                                        @RequestParam("dishPrice") double dishPrice,
+                                        @RequestParam("taste") String taste,
+                                        @RequestParam("cuisine") String cuisine,
+                                        @RequestParam("description") String description) throws IOException {
+
+        Map<String, String> response = new HashMap<>();
+        UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
+        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName).set("dish_price",dishPrice).set("dish_price",dishPrice)
+                .set("taste",taste).set("cuisine",cuisine).set("description",description).eq("dish_id", dishId);
+        if(!dishService.update(dishUpdateWrapper))
+            return Result.fail("edit fail");
+        return Result.success("edit success");
+    }
+
+//    @PostMapping("/dishAdd")
+//    public Result<String> dishAdd(@RequestParam("file") MultipartFile file,
+//                                     @RequestParam("dishName") String dishName,
+//                                     @RequestParam("dishPrice") double dishPrice,
+//                                     @RequestParam("taste") String taste,
+//                                     @RequestParam("cuisine") String cuisine,
+//                                     @RequestParam("description") String description)throws Exception{
+//
+//
+//    }
+
+    /**
+     * 根据菜品id删除菜品
+     * @param dishId
+     * @return
+     */
+    @PostMapping("/dishDelete")
+    public Result<String> dishDelete(@RequestParam("dishId") Integer dishId){
+        if(!dishService.removeById(dishId))
+            return Result.fail("delete fail");
+        return Result.success("delete success");
+    }
+
+    @PostMapping("/list")
+    public Result<List<Dish>> dishList(@RequestParam("storeId") Integer storeId)
+    {
+        QueryWrapper<Dish> dishQueryWrapper = new QueryWrapper<>();
+        dishQueryWrapper.eq("store_id", storeId);
+        List<Dish> dishList = dishService.list(dishQueryWrapper);
+        System.out.println(dishList);
+        return Result.success(dishList);
+    }
 }
