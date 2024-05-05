@@ -12,8 +12,11 @@ import com.shihui.common.Utils.CosUtil;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
 import com.shihui.fd.entity.RecognitionResult;
+import com.shihui.fd.entity.Store;
 import com.shihui.fd.entity.TwoReg;
+import com.shihui.fd.mapper.DishMapper;
 import com.shihui.fd.service.IDishService;
+import com.shihui.fd.service.IStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
@@ -294,6 +297,8 @@ public class DishController {
                                         @RequestParam("dishPrice") double dishPrice,
                                         @RequestParam("taste") String taste,
                                         @RequestParam("cuisine") String cuisine,
+                                        @RequestParam("ingredients") String ingredients,
+                                        @RequestParam("category") String category,
                                         @RequestParam("description") String description) throws IOException {
 
         UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
@@ -302,8 +307,15 @@ public class DishController {
             String imageUrl = cosUtil.uploadFile(file);
             dishUpdateWrapper.set("image_url", imageUrl).eq("dish_id", dishId);
         }
-        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName).set("dish_price",dishPrice).set("dish_price",dishPrice)
-                        .set("taste",taste).set("cuisine",cuisine).set("description",description).eq("dish_id", dishId);
+        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName)
+                .set("dish_price",dishPrice)
+                .set("dish_price",dishPrice)
+                .set("taste",taste)
+                .set("cuisine",cuisine)
+                .set("description",description)
+                .set("ingredients",ingredients)
+                .set("category", category)
+                .eq("dish_id", dishId);
         if(!dishService.update(dishUpdateWrapper))
             return Result.fail("edit fail");
         return Result.success("edit success");
@@ -316,27 +328,77 @@ public class DishController {
                                         @RequestParam("dishPrice") double dishPrice,
                                         @RequestParam("taste") String taste,
                                         @RequestParam("cuisine") String cuisine,
+                                        @RequestParam("ingredients") String ingredients,
+                                        @RequestParam("category") String category,
                                         @RequestParam("description") String description) throws IOException {
 
         Map<String, String> response = new HashMap<>();
         UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
-        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName).set("dish_price",dishPrice).set("dish_price",dishPrice)
-                .set("taste",taste).set("cuisine",cuisine).set("description",description).eq("dish_id", dishId);
+        dishUpdateWrapper.set("dish_id", dishId)
+                .set("dish_name",dishName)
+                .set("dish_price",dishPrice)
+                .set("dish_price",dishPrice)
+                .set("taste",taste)
+                .set("cuisine",cuisine)
+                .set("description",description)
+                .set("ingredients",ingredients)
+                .set("category", category)
+                .eq("dish_id", dishId);
         if(!dishService.update(dishUpdateWrapper))
             return Result.fail("edit fail");
         return Result.success("edit success");
     }
 
-//    @PostMapping("/dishAdd")
-//    public Result<String> dishAdd(@RequestParam("file") MultipartFile file,
-//                                     @RequestParam("dishName") String dishName,
-//                                     @RequestParam("dishPrice") double dishPrice,
-//                                     @RequestParam("taste") String taste,
-//                                     @RequestParam("cuisine") String cuisine,
-//                                     @RequestParam("description") String description)throws Exception{
-//
-//
-//    }
+    @Autowired IStoreService storeService;
+
+    /**
+     * 新增一个菜品
+     * @param file
+     * @param storeId
+     * @param dishName
+     * @param dishPrice
+     * @param taste
+     * @param cuisine
+     * @param ingredients
+     * @param category
+     * @param description
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/dishAdd")
+    public Result<String> dishAdd(@RequestParam("file") MultipartFile file,
+                                     @RequestParam("storeId") Integer storeId,
+                                     @RequestParam("dishName") String dishName,
+                                     @RequestParam("dishPrice") double dishPrice,
+                                     @RequestParam("taste") String taste,
+                                     @RequestParam("cuisine") String cuisine,
+                                     @RequestParam("ingredients") String ingredients,
+                                     @RequestParam("category") String category,
+                                     @RequestParam("description") String description)throws Exception{
+        Dish newDish = new Dish();
+        if(file != null && !file.isEmpty())
+        {
+            String imageUrl = cosUtil.uploadFile(file);
+            newDish.setImageUrl(imageUrl);
+        }
+        newDish.setDishName(dishName);
+        newDish.setDishPrice((float) dishPrice);
+        newDish.setTaste(taste);
+        newDish.setCuisine(cuisine);
+        newDish.setDescription(description);
+        newDish.setStoreId(storeId);
+        newDish.setIngredients(ingredients);
+        newDish.setCategory(category);
+
+        //根据storeid查出店铺位置
+        Store byId = storeService.getById(storeId);
+        newDish.setLocation(byId.getLocation());
+        newDish.setDetailedLocation(byId.getStoreLocation());
+        //存入表
+        if(!dishService.saveOrUpdate(newDish))
+            return Result.fail("fail add");
+        return Result.success("success add");
+    }
 
     /**
      * 根据菜品id删除菜品
@@ -349,6 +411,7 @@ public class DishController {
             return Result.fail("delete fail");
         return Result.success("delete success");
     }
+
 
     @PostMapping("/list")
     public Result<List<Dish>> dishList(@RequestParam("storeId") Integer storeId)
