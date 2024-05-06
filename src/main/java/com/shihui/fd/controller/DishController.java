@@ -10,15 +10,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shihui.common.DTO.RecommendationRequest;
 import com.shihui.common.Utils.CosUtil;
 import com.shihui.common.vo.Result;
-import com.shihui.fd.entity.Dish;
-import com.shihui.fd.entity.RecognitionResult;
-import com.shihui.fd.entity.Store;
-import com.shihui.fd.entity.TwoReg;
+import com.shihui.fd.entity.*;
 import com.shihui.fd.mapper.DishMapper;
-import com.shihui.fd.service.IDishService;
-import com.shihui.fd.service.IStoreService;
+import com.shihui.fd.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.wltea.analyzer.core.IKSegmenter;
@@ -291,62 +289,64 @@ public class DishController {
      * @throws IOException
      */
     @PostMapping("/dishEdit")
-    public Result<String> dishEdit(@RequestParam("file") MultipartFile file,
-                                        @RequestParam("dishId") Long dishId,
-                                        @RequestParam("dishName") String dishName,
-                                        @RequestParam("dishPrice") double dishPrice,
-                                        @RequestParam("taste") String taste,
-                                        @RequestParam("cuisine") String cuisine,
-                                        @RequestParam("ingredients") String ingredients,
-                                        @RequestParam("category") String category,
-                                        @RequestParam("description") String description) throws IOException {
+    public ResponseEntity<String> dishEdit(@RequestParam("file") MultipartFile file,
+                                           @RequestParam("dishId") Long dishId,
+                                           @RequestParam("dishName") String dishName,
+                                           @RequestParam("dishPrice") double dishPrice,
+                                           @RequestParam("taste") String taste,
+                                           @RequestParam("cuisine") String cuisine,
+                                           @RequestParam("ingredients") String ingredients,
+                                           @RequestParam("category") String category,
+                                           @RequestParam("description") String description) throws IOException {
 
         UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
-        if(file != null && !file.isEmpty())
-        {
+        if (file != null && !file.isEmpty()) {
             String imageUrl = cosUtil.uploadFile(file);
             dishUpdateWrapper.set("image_url", imageUrl).eq("dish_id", dishId);
         }
-        dishUpdateWrapper.set("dish_id", dishId).set("dish_name",dishName)
-                .set("dish_price",dishPrice)
-                .set("dish_price",dishPrice)
-                .set("taste",taste)
-                .set("cuisine",cuisine)
-                .set("description",description)
-                .set("ingredients",ingredients)
+        dishUpdateWrapper.set("dish_id", dishId)
+                .set("dish_name", dishName)
+                .set("dish_price", dishPrice)
+                .set("taste", taste)
+                .set("cuisine", cuisine)
+                .set("description", description)
+                .set("ingredients", ingredients)
                 .set("category", category)
                 .eq("dish_id", dishId);
-        if(!dishService.update(dishUpdateWrapper))
-            return Result.fail("edit fail");
-        return Result.success("edit success");
+
+        if (!dishService.update(dishUpdateWrapper)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("edit fail");
+        }
+        return ResponseEntity.ok("edit success");
     }
 
-    @PostMapping("/dishEdit1")
-    public Result<String> dishEdit(
-                                        @RequestParam("dishId") Long dishId,
-                                        @RequestParam("dishName") String dishName,
-                                        @RequestParam("dishPrice") double dishPrice,
-                                        @RequestParam("taste") String taste,
-                                        @RequestParam("cuisine") String cuisine,
-                                        @RequestParam("ingredients") String ingredients,
-                                        @RequestParam("category") String category,
-                                        @RequestParam("description") String description) throws IOException {
 
-        Map<String, String> response = new HashMap<>();
+    @GetMapping("/dishEdit1")
+    public ResponseEntity<String> dishEdit(
+            @RequestParam("dishId") Long dishId,
+            @RequestParam("dishName") String dishName,
+            @RequestParam("dishPrice") double dishPrice,
+            @RequestParam("taste") String taste,
+            @RequestParam("cuisine") String cuisine,
+            @RequestParam("ingredients") String ingredients,
+            @RequestParam("category") String category,
+            @RequestParam("description") String description) throws IOException {
+
         UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
         dishUpdateWrapper.set("dish_id", dishId)
-                .set("dish_name",dishName)
-                .set("dish_price",dishPrice)
-                .set("dish_price",dishPrice)
-                .set("taste",taste)
-                .set("cuisine",cuisine)
-                .set("description",description)
-                .set("ingredients",ingredients)
+                .set("dish_name", dishName)
+                .set("dish_price", dishPrice)
+                .set("taste", taste)
+                .set("cuisine", cuisine)
+                .set("description", description)
+                .set("ingredients", ingredients)
                 .set("category", category)
                 .eq("dish_id", dishId);
-        if(!dishService.update(dishUpdateWrapper))
-            return Result.fail("edit fail");
-        return Result.success("edit success");
+
+        if (!dishService.update(dishUpdateWrapper)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("edit fail");
+        }
+        return ResponseEntity.ok("edit success");
     }
 
     @Autowired IStoreService storeService;
@@ -366,18 +366,17 @@ public class DishController {
      * @throws Exception
      */
     @PostMapping("/dishAdd")
-    public Result<String> dishAdd(@RequestParam("file") MultipartFile file,
-                                     @RequestParam("storeId") Integer storeId,
-                                     @RequestParam("dishName") String dishName,
-                                     @RequestParam("dishPrice") double dishPrice,
-                                     @RequestParam("taste") String taste,
-                                     @RequestParam("cuisine") String cuisine,
-                                     @RequestParam("ingredients") String ingredients,
-                                     @RequestParam("category") String category,
-                                     @RequestParam("description") String description)throws Exception{
+    public ResponseEntity<String> dishAdd(@RequestParam("file") MultipartFile file,
+                                          @RequestParam("storeId") Integer storeId,
+                                          @RequestParam("dishName") String dishName,
+                                          @RequestParam("dishPrice") double dishPrice,
+                                          @RequestParam("taste") String taste,
+                                          @RequestParam("cuisine") String cuisine,
+                                          @RequestParam("ingredients") String ingredients,
+                                          @RequestParam("category") String category,
+                                          @RequestParam("description") String description) throws Exception {
         Dish newDish = new Dish();
-        if(file != null && !file.isEmpty())
-        {
+        if (file != null && !file.isEmpty()) {
             String imageUrl = cosUtil.uploadFile(file);
             newDish.setImageUrl(imageUrl);
         }
@@ -390,32 +389,67 @@ public class DishController {
         newDish.setIngredients(ingredients);
         newDish.setCategory(category);
 
-        //根据storeid查出店铺位置
+        // 根据 storeId 查出店铺位置
         Store byId = storeService.getById(storeId);
         newDish.setLocation(byId.getLocation());
         newDish.setDetailedLocation(byId.getStoreLocation());
-        //存入表
-        if(!dishService.saveOrUpdate(newDish))
-            return Result.fail("fail add");
-        return Result.success("success add");
+
+        // 存入表
+        boolean result = dishService.saveOrUpdate(newDish);
+        if (result) {
+            return ResponseEntity.ok("success add");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("fail add");
+        }
     }
+
 
     /**
      * 根据菜品id删除菜品
      * @param dishId
      * @return
      */
-    @PostMapping("/dishDelete")
-    public Result<String> dishDelete(@RequestParam("dishId") Integer dishId){
-        if(!dishService.removeById(dishId))
-            return Result.fail("delete fail");
-        return Result.success("delete success");
+    @Autowired
+    IEvaluationService evaluationService;
+    @Autowired
+    IBrowseHistoryService browseHistoryService;
+    @Autowired
+    IUserFavoriteDishService userFavoriteDishService;
+    @Autowired
+    IUserLikeDishService userLikeDishService;
+    @GetMapping("/dishDelete")
+    public ResponseEntity<String> dishDelete(@RequestParam("dishId") Integer dishId) {
+        //删除评价点赞和收藏
+        QueryWrapper<Evaluation> evaluationQueryWrapper = new QueryWrapper<>();
+        evaluationQueryWrapper.eq("dish_id", dishId);
+        evaluationService.remove(evaluationQueryWrapper);
+
+        QueryWrapper<BrowseHistory> browseHistoryQueryWrapper = new QueryWrapper<>();
+        browseHistoryQueryWrapper.eq("dish_id", dishId);
+        browseHistoryService.remove(browseHistoryQueryWrapper);
+
+        QueryWrapper<UserLikeDish> userLikeDishQueryWrapper = new QueryWrapper<>();
+        userLikeDishQueryWrapper.eq("dish_id", dishId);
+        userLikeDishService.remove(userLikeDishQueryWrapper);
+
+        QueryWrapper<UserFavoriteDish> userFavoriteDishQueryWrapper = new QueryWrapper<>();
+        userFavoriteDishQueryWrapper.eq("dish_id", dishId);
+        userFavoriteDishService.remove(userFavoriteDishQueryWrapper);
+
+        boolean result = dishService.removeById(dishId);
+        if (result) {
+            return ResponseEntity.ok("delete success");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("delete fail");
+        }
     }
 
 
-    @PostMapping("/list")
+
+    @GetMapping("/list")
     public Result<List<Dish>> dishList(@RequestParam("storeId") Integer storeId)
     {
+        System.out.println("s:"+storeId);
         QueryWrapper<Dish> dishQueryWrapper = new QueryWrapper<>();
         dishQueryWrapper.eq("store_id", storeId);
         List<Dish> dishList = dishService.list(dishQueryWrapper);

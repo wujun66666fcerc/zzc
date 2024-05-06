@@ -2,6 +2,8 @@ package com.shihui.fd.controller;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shihui.common.DTO.StoreRequest;
 import com.shihui.common.vo.Result;
 import com.shihui.fd.entity.Dish;
@@ -13,11 +15,14 @@ import com.shihui.fd.service.IDishService;
 import com.shihui.fd.service.IOwnershipService;
 import com.shihui.fd.service.IStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -49,47 +54,53 @@ public class StoreController {
      * @return
      */
     @PostMapping("/saveOrUpdate")
-    public Result<String> saveOrUpdateStore(@RequestBody StoreRequest storeRequest)
-    {
+    public ResponseEntity<String> saveOrUpdateStore(@RequestBody StoreRequest storeRequest) throws JsonProcessingException {
         String merchantId = storeRequest.getMerchantId();
         Store store = storeRequest.getStore();
-        //先标记是否是新增
+        System.out.println(store);
+
+        // 先标记是否是新增
         boolean add;
         if (store.getStoreId() == null)
             add = true;
         else
             add = false;
-        //新增或修改一个店铺
+
+        // 新增或修改一个店铺
         boolean flag = storeService.saveOrUpdate(store);
         if (!flag)
-            return Result.fail("fail");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to save or update store");
 
-        //如果新增一个店铺，那么要新增关系表，增加店铺和商家的关系
-        if(add)
-        {
+        // 如果新增一个店铺，那么要新增关系表，增加店铺和商家的关系
+        if (add) {
             Ownership ow = new Ownership();
             ow.setMerchantAccount(merchantId);
             ow.setStoreId(store.getStoreId());
-            ow.setMerchantAccount(merchantId);
             ownershipService.save(ow);
-        }
-        //如果修改了店铺信息，那么店铺所有的菜品的位置肯会更改
-        //修改菜品的位置
-        else
-        {
+
+            Map<String, Integer> responseMap = new HashMap<>();
+            responseMap.put("storeId", store.getStoreId());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonResponse = objectMapper.writeValueAsString(responseMap);
+            return ResponseEntity.ok(jsonResponse);
+        } else {
+            // 如果修改了店铺信息，那么店铺所有的菜品的位置肯会更改
+            // 修改菜品的位置
             QueryWrapper<Dish> dishQueryWrapper = new QueryWrapper<>();
             dishQueryWrapper.eq("store_id", store.getStoreId());
-            //根据店铺id = store_id查找店铺的菜品
+            // 根据店铺id = store_id查找店铺的菜品
             List<Dish> dishList = dishService.list(dishQueryWrapper);
-            //对每个菜品修改detailed_location 和 location
+            // 对每个菜品修改detailed_location 和 location
             for (Dish d : dishList){
                 d.setDetailedLocation(store.getStoreLocation());
                 d.setLocation(store.getLocation());
                 dishService.updateById(d);
             }
         }
-        return Result.success("success");
+
+        return ResponseEntity.ok("Success");
     }
+
 
     /**
      * 删除店铺
@@ -97,25 +108,30 @@ public class StoreController {
      * @return
      */
     @PostMapping ("/deleteById")
-    public Result<String> deleteById(@RequestBody StoreRequest storeRequest)
-    {
+    public ResponseEntity<String> deleteById(@RequestBody StoreRequest storeRequest) {
         String merchantId = storeRequest.getMerchantId();
         Store store = storeRequest.getStore();
-        //删除店铺首先要删除店铺的所有菜品
+
+        // 删除店铺首先要删除店铺的所有菜品
         QueryWrapper<Dish> dishQueryWrapper = new QueryWrapper<>();
         dishQueryWrapper.eq("store_id", store.getStoreId());
-        //批量删除
-        if(!dishService.remove(dishQueryWrapper))
-            return Result.fail("fail");
-        //还要删除相关的关系
+        // 批量删除
+        dishService.remove(dishQueryWrapper);
+
+        // 还要删除相关的关系
         QueryWrapper<Ownership> ownershipQueryWrapper = new QueryWrapper<>();
         ownershipQueryWrapper.eq("store_id", store.getStoreId()).eq("merchant_account", merchantId);
-        if(!ownershipService.remove(ownershipQueryWrapper))
-            return Result.fail("fail");
-        //再删除店铺
-        if(!storeService.removeById(store.getStoreId()))
-            return Result.fail("fail");
-        return Result.success("success");
+        if (!ownershipService.remove(ownershipQueryWrapper)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to delete ownerships");
+        }
+
+        // 再删除店铺
+        if (!storeService.removeById(store.getStoreId())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to delete store");
+        }
+
+        return ResponseEntity.ok("Success");
     }
+
 
 }

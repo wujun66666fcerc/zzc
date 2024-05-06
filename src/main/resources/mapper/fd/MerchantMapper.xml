@@ -10,13 +10,14 @@
             <result property="storeId" column="storeId"/>
             <result property="storeName" column="storeName"/>
             <result property="storeLocation" column="storeLocation"/>
+            <result property="location" column="location"/>
         </collection>
     </resultMap>
 
     <select id="getMerchantStoreInfo" resultMap="MerchantStoreInfoResultMap">
         SELECT m.account AS merchantAccount, m.name AS merchantName, m.phone AS merchantPhone,
                m.audit_status AS auditStatus,
-               s.store_id AS storeId, s.store_name AS storeName, s.store_location AS storeLocation
+               s.store_id AS storeId, s.store_name AS storeName, s.store_location AS storeLocation, s.location AS location
         FROM merchant m
                  LEFT JOIN ownership o ON m.account = o.merchant_account
                  LEFT JOIN store s ON o.store_id = s.store_id
